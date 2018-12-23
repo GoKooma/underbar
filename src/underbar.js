@@ -7,6 +7,7 @@
   // seem very useful, but remember it--if a function needs to provide an
   // iterator when the user does not pass one in, this will be handy.
   _.identity = function(val) {
+    return val;
   };
 
   /**
@@ -37,6 +38,17 @@
   // Like first, but for the last elements. If n is undefined, return just the
   // last element.
   _.last = function(array, n) {
+
+    if (n === undefined) {
+      return array[array.length - 1];
+    } else if (n === 0) {
+      return [];
+    } else if (n > array.length) {
+      return array;
+    } else {
+      return array.slice(n - 1, array.length);
+    }
+
   };
 
   // Call iterator(value, key, collection) for each element of collection.
@@ -45,6 +57,20 @@
   // Note: _.each does not have a return value, but rather simply runs the
   // iterator function over each item in the input collection.
   _.each = function(collection, iterator) {
+    // check whether the collection is an array or an object
+    if (Array.isArray(collection)) {
+
+      for (var i = 0; i < collection.length; i++) {
+        iterator(collection[i], i, collection);
+      }
+
+    } else {
+
+      for (var i in collection) {
+        iterator(collection[i], i, collection);
+      }
+
+    }
   };
 
   // Returns the index at which value can be found in the array, or -1 if value
@@ -66,16 +92,68 @@
 
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, test) {
+    var collector = [];
+
+    _.each(collection, function(item, index) {
+      if (test(item) === true) {
+        collector.push(item);
+      }
+    })
+
+    return collector;
   };
 
   // Return all elements of an array that don't pass a truth test.
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
+    var collector = [];
+
+    _.each(collection, function(item, index) {
+      if (test(item) === false) {
+        collector.push(item);
+      }
+    })
+
+    return collector;
   };
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator) {
+    var sortedArray = [];
+
+    if (isSorted === true) {
+      let checkedElement = array[0];
+      sortedArray.push(checkedElement);
+
+      for (var i = 1; i < array.length; i++) {
+        if (checkedElement !== array[i]) {
+          sortedArray.push(array[i]);
+          checkedElement = array[i];
+
+        }
+        if (!iterator(array[i])) {
+          return sortedArray;
+        }
+      }
+
+      for (var j of sortedArray) {
+        iterator(sortedArray[j], j, sortedArray);
+      }
+
+      return sortedArray;
+
+    } 
+    else {
+      let checkedElement = array[0];
+      for (var i of array) {
+        for (var j = i + 1; j < array.length; j++) {
+          for (var k = j; k >= 0; k--) {
+
+          }
+        }
+      }
+    }
   };
 
 
