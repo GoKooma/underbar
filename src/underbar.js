@@ -120,41 +120,58 @@
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator) {
-    var sortedArray = [];
-
+    // declare empty array
+    var sortedUniqueArray = [];
+    // if the array is sorted, create unique array and test against iterator
     if (isSorted === true) {
+      
       let checkedElement = array[0];
-      sortedArray.push(checkedElement);
+      sortedUniqueArray.push(checkedElement);
 
+      // compare neighboring elements. If the elements are not identical,
+      // create array with the unidentical element
       for (var i = 1; i < array.length; i++) {
         if (checkedElement !== array[i]) {
-          sortedArray.push(array[i]);
+          sortedUniqueArray.push(array[i]);
           checkedElement = array[i];
-
         }
+        // test against iterator. If it does not pass test, return the array
         if (!iterator(array[i])) {
-          return sortedArray;
+          return sortedUniqueArray;
         }
       }
-
-      for (var j of sortedArray) {
-        iterator(sortedArray[j], j, sortedArray);
+      // otherwise, iterate the elements
+      for (var j of sortedUniqueArray) {
+        iterator(sortedUniqueArray[j], j, sortedUniqueArray);
       }
+      // return the sorted unique array
+      return sortedUniqueArray;
+    } else {
+      // copy the array to avoid altering original array - check for optimal design
+      let copiedArray = [];
+      for (var k = 0; k < array.length; k++) {
+        copiedArray.push(array[k]);
+      }
+      
+      for (var i = 0; i < array.length; i++) {
+        var smallestValue = array[i];
 
-      return sortedArray;
-
-    } 
-    else {
-      let checkedElement = array[0];
-      for (var i of array) {
         for (var j = i + 1; j < array.length; j++) {
-          for (var k = j; k >= 0; k--) {
-
+          if (array[j] === smallestValue) {
+            delete copiedArray[j];
           }
         }
       }
-    }
-  };
+      sortedUniqueArray.push(copiedArray[0]);
+      for (var i = 1; i < array.length; i++) {
+        if (copiedArray[i] !== undefined) {
+          sortedUniqueArray.push(copiedArray[i]);
+        }
+      }
+
+    return sortedUniqueArray;
+  }
+};
 
 
   // Return the results of applying an iterator to each element.
@@ -162,6 +179,20 @@
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
+    if (Array.isArray(collection)) {
+      var results = [];
+      for (var i = 0; i < collection.length; i++) {
+        results.push(iterator(collection[i], i, collection));
+      }
+
+    } else {
+
+      for (var i in collection) {
+        results.push(iterator(collection[i], i, collection));
+      }
+
+    }
+    return results;
   };
 
   /*
@@ -203,6 +234,25 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+    if (Array.isArray(collection)) {
+      if (accumulator === undefined) {
+        accumulator = collection[0];
+        for (var i = 1; i < collection.length; i++) {
+          accumulator = iterator(accumulator, i);
+        }
+        return accumulator;
+      } else {
+        for (var i of collection) {
+          accumulator = iterator(accumulator, i);
+        }
+        return accumulator;
+      }
+    } else {
+      // for (var i in collection) {
+      //   accumulator = iterator(accumulator, i);
+      // }
+    }
+    return accumulator
   };
 
   // Determine if the array or object contains a given value (using `===`).
