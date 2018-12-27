@@ -408,16 +408,25 @@
   // instead if possible.
   _.memoize = function(func) {
     var results = {};
-    var key;
+    var key = {};
     
     function f() {
-      var slice = Array.prototype.slice;
-      key = slice.call(arguments);
-
+      if (!(Array.isArray(arguments[0]))) {
+        var slice = Array.prototype.slice;
+        key = slice.call(arguments);
+        // if the first argument is not an array, put all arguments into an array
+        // and override the variable key as an array
+      } else {
+        // if the argument is an array, make it an object
+        for (var i = 0; i < arguments.length; i++) {
+          key[i] = arguments[i];
+        }
+      }
+      // if no key is in the results cache, memoize dat function
       if (!(key in results)) {
         results[key] = func.apply(this, key);
       }
-
+    
       return results[key];
     }
 
@@ -431,7 +440,9 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
-    
+    setTimeout(function() {
+      return func.apply(null, arguments);
+    }, wait);
   };
 
 
