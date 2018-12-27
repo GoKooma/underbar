@@ -441,7 +441,18 @@
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
     setTimeout(function() {
-      return func.apply(null, arguments);
+      if (arguments.length < 2) {
+        return func.apply(this, arguments);
+      } else {
+        var args = Array.from(arguments);
+        delete args[0];
+        delete args[1];
+        console.log(args);
+        return func.apply(this, args);
+        // for (var i = 2; i < arguments.length; i++) {
+        //   func.call(this, arguments[i]);
+        // }
+      }
     }, wait);
   };
 
@@ -457,6 +468,17 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    var copy = array.slice();
+    var shuffled = [];
+    var counter = 0;
+    var randInd;
+    while (counter < array.length) {
+      counter++;
+      randInd = parseInt(Math.random() * copy.length);
+      shuffled.push(copy[randInd]);
+      delete copy[randInd];
+    }
+    return shuffled;
   };
 
 
